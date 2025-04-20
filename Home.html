@@ -40,6 +40,7 @@
       border-radius: 10px;
       margin-bottom: 20px;
       transition: transform 0.3s;
+      cursor: pointer;
     }
     .post:hover, .ad-block:hover {
       transform: scale(1.02);
@@ -58,6 +59,45 @@
       color: #ff80c1;
       font-weight: bold;
       text-decoration: none;
+      font-size: 18px;
+    }
+    /* Hot Badge */
+    .hot-badge {
+      background-color: #ff4da6;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    /* Pinned Promo Styling */
+    .pinned-promo {
+      background: #ff80c1;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+    }
+    .pinned-promo:hover {
+      transform: scale(1.05);
+    }
+    .pinned-promo h2 {
+      font-size: 24px;
+      color: #1f1f1f;
+    }
+    .pinned-promo p {
+      font-size: 18px;
+      color: #1f1f1f;
+    }
+    .pinned-promo a {
+      color: #1f1f1f;
+      font-size: 18px;
+      text-decoration: underline;
     }
 
     /* Floating Buttons Positioning */
@@ -115,11 +155,19 @@
       <p class="tagline">Indulge in the hottest fantasies...</p>
     </header>
 
+    <!-- Pinned Promo -->
+    <div class="post pinned-promo" onclick="window.open('https://t.me/KyiMalApyar/38', '_blank')">
+      <h2>📌 Want to watch full videos without issues?</h2>
+      <p><strong>Click here for the secret trick to unlock my hottest content!</strong></p>
+      <p style="color:#1f1f1f;text-decoration:underline;">👉 <a href="https://t.me/KyiMalApyar/38" target="_blank">Click here to join the Telegram group!</a></p>
+    </div>
+
     <!-- Post 1 -->
-    <div class="post">
-      <img src="https://via.placeholder.com/800x400.png?text=Sexy+Post+1" alt="Post 1" />
+    <div class="post" onclick="window.open('https://example.com/fullvideo1', '_blank')">
+      <img src="https://i.postimg.cc/sfTshz8S/Neymar.jpg" alt="Post 1" />
       <h2>🔥 Naughty Nurse Teaser</h2>
       <p>This naughty nurse is ready to play... Ready for the real action?</p>
+      <span class="hot-badge">HOT</span>
       <a href="https://example.com/fullvideo1" target="_blank">Watch Full Video</a>
     </div>
 
@@ -138,10 +186,11 @@
     </div>
 
     <!-- Post 2 -->
-    <div class="post">
+    <div class="post" onclick="window.open('https://example.com/fullvideo2', '_blank')">
       <img src="https://via.placeholder.com/800x400.png?text=Sexy+Post+2" alt="Post 2" />
       <h2>💋 Amateur Couple Fun</h2>
       <p>This couple brings the heat in every way... Don’t miss the fun!</p>
+      <span class="hot-badge">HOT</span>
       <a href="https://example.com/fullvideo2" target="_blank">Watch Full Video</a>
     </div>
 
@@ -152,10 +201,11 @@
     </div>
 
     <!-- Post 3 -->
-    <div class="post">
+    <div class="post" onclick="window.open('https://example.com/fullvideo3', '_blank')">
       <img src="https://via.placeholder.com/800x400.png?text=Sexy+Post+3" alt="Post 3" />
       <h2>✨ Exotic Dance Experience</h2>
       <p>Join us for an exotic experience that will tantalize your senses...</p>
+      <span class="hot-badge">HOT</span>
       <a href="https://example.com/fullvideo3" target="_blank">Watch Full Video</a>
     </div>
 
