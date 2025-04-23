@@ -42,6 +42,7 @@
       transition: transform 0.3s;
       cursor: pointer;
       text-align: center; /* Center items inside ad block */
+      position: relative;
     }
     .post:hover, .ad-block:hover {
       transform: scale(1.02);
@@ -55,6 +56,9 @@
     .post h2, .ad-block h2 {
       color: #ff4da6;
       margin-top: 10px;
+    }
+    .post p {
+      margin: 10px 0;
     }
     .post a {
       color: #ff80c1;
@@ -72,6 +76,7 @@
       position: absolute;
       top: 10px;
       right: 10px;
+      user-select: none;
     }
 
     /* Pinned Promo Styling */
@@ -83,22 +88,26 @@
       text-align: center;
       cursor: pointer;
       transition: transform 0.3s ease-in-out;
+      color: #1f1f1f;
+      position: relative;
     }
     .pinned-promo:hover {
       transform: scale(1.05);
     }
     .pinned-promo h2 {
       font-size: 24px;
+      margin: 0 0 10px 0;
       color: #1f1f1f;
     }
     .pinned-promo p {
       font-size: 18px;
+      margin: 0 0 10px 0;
       color: #1f1f1f;
     }
     .pinned-promo a {
-      color: #1f1f1f;
       font-size: 18px;
       text-decoration: underline;
+      color: #1f1f1f;
     }
 
     /* Floating Buttons Positioning */
@@ -109,6 +118,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      z-index: 9999;
     }
     .floating-buttons a {
       background: #ff4da6;
@@ -118,6 +128,7 @@
       text-decoration: none;
       font-size: 14px;
       text-align: center;
+      user-select: none;
     }
     .floating-buttons a:hover {
       background: #ff80c1;
@@ -177,7 +188,7 @@
     <div class="post pinned-promo" onclick="window.open('https://t.me/KyiMalApyar/38', '_blank')">
       <h2>📌 Want to watch full videos without issues?</h2>
       <p><strong>Click here for the secret trick to unlock my hottest content!</strong></p>
-      <p style="color:#1f1f1f;text-decoration:underline;">👉 <a href="https://t.me/KyiMalApyar/38" target="_blank">Click here to join the Telegram group!</a></p>
+      <p style="color:#1f1f1f;text-decoration:underline;">👉 <a href="https://t.me/KyiMalApyar/38" target="_blank" rel="noopener noreferrer">Click here to join the Telegram group!</a></p>
     </div>
 
     <!-- In-content Ad -->
@@ -210,7 +221,7 @@
 
     <!-- Floating Buttons -->
     <div class="floating-buttons">
-      <a href="https://t.me/KyiMalApyar " target="_blank">Join Telegram</a>
+      <a href="https://t.me/KyiMalApyar" target="_blank" rel="noopener noreferrer">Join Telegram</a>
       <a href="#" onclick="copyWallet()">💸 Donate USDT</a>
     </div>
 
@@ -227,56 +238,77 @@
   <script>
     const walletAddress = "TCN48ebvBocsvfb75jiiMT3djwm9DSW9YY";
     const postsContainer = document.getElementById('postsContainer');
-
-    const totalPosts = 100; // Total number of posts
-    const postsPerPage = 10; // Number of posts to show per page
+    const postsPerPage = 10;
     let currentPage = 1;
+    let postsData = [];
 
-    // Function to create a post
-    function createPost(postNumber) {
+    // Fetch posts data from posts.json
+    async function fetchPosts() {
+      try {
+        const response = await fetch('posts.json');
+        if (!response.ok) throw new Error('Failed to load posts data');
+        postsData = await response.json();
+        currentPage = 1;
+        loadPosts();
+      } catch (err) {
+        postsContainer.innerHTML = '<p style="color:#f88;">Failed to load posts data.</p>';
+        console.error(err);
+      }
+    }
+
+    // Create HTML for one post item
+    function createPost(post) {
       return `
-        <div class="post" onclick="window.open('https://mxdrop.to/e/nlpm890ea060wj', '_blank')">
-          <img src="https://i.postimg.cc/N0tSw-PQY/1.webp" alt="Post ${postNumber}" />
-          <h2>🔥 Post Title ${postNumber}</h2>
-          <p>This is a description for post ${postNumber}...</p>
+        <div class="post" onclick="window.open('${post.videoUrl}', '_blank')">
+          <img src="${post.imageUrl}" alt="${post.title}" />
+          <h2>${post.title}</h2>
+          <p>${post.description}</p>
           <span class="hot-badge">HOT</span>
-          <a href="https://mxdrop.to/e/nlpm890ea060wj" target="_blank">Watch Full Video</a>
+          <a href="${post.videoUrl}" target="_blank" rel="noopener noreferrer">Watch Full Video</a>
         </div>
       `;
     }
 
-    // Function to load posts according to the page number
+    // Load posts for current page
     function loadPosts() {
-      postsContainer.innerHTML = ''; // Clear previous posts
-      const startPost = (currentPage - 1) * postsPerPage + 1; // Calculate start post number
-      const endPost = Math.min(startPost + postsPerPage - 1, totalPosts); // Calculate end post number
-      for (let i = startPost; i <= endPost; i++) {
-        postsContainer.innerHTML += createPost(i);
+      postsContainer.innerHTML = '';
+      const totalPosts = postsData.length;
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = Math.min(startIndex + postsPerPage, totalPosts);
+      for(let i = startIndex; i < endIndex; i++) {
+        postsContainer.innerHTML += createPost(postsData[i]);
       }
-      updatePaginationControls();
+      updatePaginationControls(totalPosts);
     }
 
-    // Function to update pagination controls
-    function updatePaginationControls() {
-      document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${Math.ceil(totalPosts / postsPerPage)}`;
+    // Update pagination UI
+    function updatePaginationControls(totalPosts) {
+      const totalPages = Math.ceil(totalPosts / postsPerPage);
+      document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages || 1}`;
       document.getElementById('prevBtn').disabled = currentPage === 1;
-      document.getElementById('nextBtn').disabled = currentPage === Math.ceil(totalPosts / postsPerPage);
+      document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
     }
 
-    // Function to change the page
+    // Change page on button click
     function changePage(direction) {
+      const totalPosts = postsData.length;
+      const totalPages = Math.ceil(totalPosts / postsPerPage);
       currentPage += direction;
+      if(currentPage < 1) currentPage = 1;
+      if(currentPage > totalPages) currentPage = totalPages;
       loadPosts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Invoke the function to load posts
-    loadPosts();
-
+    // Copy wallet address for donations
     function copyWallet() {
       navigator.clipboard.writeText(walletAddress).then(() => {
         alert("💸 Copied USDT Wallet – please donate and support my spicy content!");
       });
     }
+
+    // Initial fetch and load posts
+    fetchPosts();
   </script>
 
   <!-- Popunder Ads -->
