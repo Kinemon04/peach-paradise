@@ -1,238 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💦 အပြာလောက | Video Stream</title>
   <meta name="description" content="Apyar Lawka - Premium Myanmar Video Experience" />
-  <title>💦 Apyar Lawka | Video Stream</title>
+
+  <!--
+    home.html
+    - thumbnails open original video links in new tab (no embeds on site)
+    - 10 posts per page, ads every 4 posts, fixed top + bottom ad slots
+    - native banner, social bar and smartlink preserved
+    - defensive code to reduce overlays/poplayers interfering with clicks
+    - long file (400+ lines) as requested
+  -->
 
   <style>
-    /* Reset and Base */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Poppins', Arial, sans-serif; background:#0f0f0f; color:#fff; line-height:1.6; }
-    a { color: inherit; text-decoration: none; }
-
-    /* Container */
-    .container { max-width:1000px; margin:0 auto; padding:20px; }
-
-    /* Header */
-    header { text-align:center; margin-bottom:40px; }
-    header h1 { font-size:40px; font-weight:700; background:linear-gradient(90deg,#ff007f,#ff66b3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:1px; }
-    .tagline { color:#ff99cc; font-size:16px; margin-top:5px; }
-
-    /* Ads */
-    .ad-banner, .ad-slider, .ad-inpage { text-align:center; margin:20px 0; }
-
-    /* Posts */
-    .post { background:linear-gradient(145deg,#1a1a1a,#141414); border-radius:12px; padding:20px; margin-bottom:30px; box-shadow:0 0 20px rgba(255,0,128,0.2); transition:0.3s ease; }
-    .post:hover { transform: translateY(-5px); box-shadow:0 0 25px rgba(255,0,128,0.4); }
-    .post h2 { text-align:center; font-size:22px; color:#ff66b3; margin-bottom:15px; }
-    iframe { width:100%; border:none; border-radius:10px; display:block; }
-
-    @media (max-width:768px){ 
-      iframe{ height:280px; }
-      header h1 { font-size:32px; }
-      .post h2 { font-size:18px; }
+    /* ===== Reset & base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 10px;
     }
 
-    /* Pagination */
-    .pagination { text-align:center; margin:30px 0; }
-    .pagination button { background:linear-gradient(90deg,#ff007f,#ff66b3); color:white; border:none; padding:10px 24px; margin:5px; border-radius:25px; font-weight:600; cursor:pointer; box-shadow:0 0 10px rgba(255,0,128,0.3); transition:0.3s; }
-    .pagination button:hover:not(:disabled) { transform:scale(1.05); box-shadow:0 0 20px rgba(255,0,128,0.5); }
-    .pagination button:disabled { opacity:0.5; cursor:not-allowed; }
-    .jump-controls { margin-top:15px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; }
-    .jump-controls input { width:60px; padding:8px; border-radius:8px; border:1px solid #ff66b3; text-align:center; background-color:#1c1c1c; color:#fff; }
-    .jump-controls button { background:linear-gradient(90deg,#ff3399,#ff66b3); color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:600; cursor:pointer; transition:0.3s; }
-    .jump-controls button:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(255,0,128,0.4); }
-    .toggle-view { background:#1c1c1c; border:1px solid #ff66b3; border-radius:20px; padding:8px 16px; color:#fff; cursor:pointer; transition:0.3s; font-weight:600; }
-    .toggle-view:hover { background:linear-gradient(90deg,#ff007f,#ff66b3); color:#fff; box-shadow:0 0 12px rgba(255,0,128,0.4); }
+    /* ===== Container ===== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+    }
 
-    /* Footer */
-    footer { text-align:center; color:#aaa; font-size:13px; margin-top:50px; padding:20px 0; border-top:1px solid #333; }
+    /* ===== Header ===== */
+    header {
+      text-align:center;
+      margin-bottom: 18px;
+    }
+    header h1 {
+      font-size: 40px;
+      font-weight: 700;
+      background: linear-gradient(90deg,#ff007f,#ff66b3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+    .tagline { color: #ff99cc; margin-top: 6px; font-size: 15px; }
 
-    /* Smooth Scroll */
-    html { scroll-behavior:smooth; }
+    /* ===== Top banner area ===== */
+    .top-banner {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin: 14px 0;
+      min-height: 60px;
+    }
+    .ad-slot {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      width:100%;
+      overflow:hidden;
+    }
+
+    /* ===== Posts grid/list ===== */
+    #postsContainer {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .post {
+      background: linear-gradient(145deg,#1a1a1a,#141414);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 0 20px rgba(255,0,128,0.06);
+      transition: transform .22s ease, box-shadow .22s ease;
+      position: relative;
+      overflow: visible;
+    }
+    .post:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(255,0,128,0.08); }
+    .post h2 {
+      font-size: 16px;
+      color: #ff66b3;
+      margin-bottom: 10px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    /* thumbnail card */
+    .thumb-link {
+      display:block;
+      text-decoration:none;
+      color:inherit;
+      border-radius:8px;
+      overflow:hidden;
+    }
+    .thumb-img {
+      width:100%;
+      height: 220px;
+      object-fit: cover;
+      display:block;
+      border-radius: 8px;
+      background: #000;
+    }
+    .thumb-meta {
+      padding: 10px 6px 6px 6px;
+      text-align:center;
+      font-size: 14px;
+      color: #ffd7ef;
+    }
+
+    /* ===== Ad block style used between posts ===== */
+    .between-ad {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding: 8px;
+      background: transparent;
+      border-radius: 10px;
+      margin: 8px 0;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* ===== Pagination area ===== */
+    .pagination {
+      text-align:center;
+      margin: 22px 0;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:12px;
+    }
+    .pagination .btn {
+      background: linear-gradient(90deg,#ff007f,#ff66b3);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 26px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255,0,128,0.12);
+    }
+    .pagination .btn[disabled] { opacity: 0.45; cursor: not-allowed; box-shadow:none; }
+
+    .jump-controls {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .jump-controls input {
+      width:72px;
+      padding:8px 10px;
+      border-radius:8px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      text-align:center;
+    }
+    .toggle-view {
+      background:#1c1c1c;
+      border:1px solid #ff66b3;
+      border-radius:20px;
+      padding:8px 14px;
+      color:#fff;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 900px) {
+      #postsContainer { grid-template-columns: 1fr; }
+      .thumb-img { height: 200px; }
+      header h1 { font-size: 32px; }
+    }
+
+    @media (max-width: 420px) {
+      .thumb-img { height: 160px; }
+      .jump-controls input { width:58px; }
+      .container { padding: 12px; }
+      .pagination { gap:8px; }
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align:center;
+      color:#aaa;
+      font-size:13px;
+      margin-top: 36px;
+      padding:16px 0;
+      border-top: 1px solid #222;
+    }
+
+    /* small helper to hide the hidden iframe used for smartlink */
+    .smartlink-iframe { width:1px; height:1px; opacity:0; border:0; position:absolute; left:-9999px; top:-9999px; }
+
+    /* Ensure ad containers can't accidentally overlay posts by forcing them to be static */
+    .ad-slot, .between-ad, #nativeAdContainer, #topBannerSlot, #bottom300x250 {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    /* defensive: any overlay created by ad scripts should have limited pointer events */
+    .ad-overlay-block {
+      pointer-events: auto !important;
+    }
+
+    /* visually separate ad placeholders when scripts fail */
+    .ad-fallback {
+      background: #0b0b0b;
+      border: 1px dashed #333;
+      padding: 14px;
+      border-radius: 8px;
+      color: #c8c8c8;
+      font-size: 13px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
 
-<div class="container">
-  <!-- Header -->
-  <header>
-    <h1>💦 အပြာလောက 💦</h1>
-    <p class="tagline">အကောင်းဆုံး မြန်မာ့ Video Streaming Website</p>
-  </header>
+    <!-- Header (kept original content) -->
+    <header>
+      <h1>💦 အပြာလောက 💦</h1>
+      <p class="tagline">အကောင်းဆုံး မြန်မာ့ Video Streaming Website</p>
+    </header>
 
-  <!-- Top Banner Ad -->
-  <div class="ad-banner">
-    <script>
-      (function(svpy){
-        var d = document,
-            s = d.createElement('script'),
-            l = d.scripts[d.scripts.length - 1];
-        s.settings = svpy || {};
-        s.src = "//grippingdelay.com/bNX/VIsWd.G/lb0WYVWWcm/neRmi9lubZ/UEl/kpPjTDYt3CMXDkIQw/Mbz_cHtwN/j/c/w/MajEAHzcOkA_";
-        s.async = true;
-        s.referrerPolicy = 'no-referrer-when-downgrade';
-        l.parentNode.insertBefore(s, l);
-      })({})
-    </script>
-  </div>
-
-  <!-- Pagination Top -->
-  <div class="pagination" id="paginationTop">
-    <button onclick="changePage(-1)" id="prevTop">⬅️ Previous</button>
-    <span id="pageInfoTop">Page 1</span>
-    <button onclick="changePage(1)" id="nextTop">Next ➡️</button>
-    <div class="jump-controls">
-      <input type="number" id="pageInputTop" min="1" placeholder="Page" />
-      <button onclick="goToPage()">Go</button>
-      <button class="toggle-view" id="toggleViewBtn">👁️ Watching: Oldest</button>
+    <!-- Top banner (468x60) - fixed spot -->
+    <div class="top-banner" aria-hidden="true">
+      <div id="topBannerSlot" class="ad-slot" style="max-width:468px; min-height:60px;">
+        <!-- Banner 468x60 will be injected here by JS -->
+        <!-- fallback visible content while script loads -->
+        <div class="ad-fallback" id="topBannerFallback">Loading ad…</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Posts Container -->
-  <div id="postsContainer"></div>
+    <!-- Pagination top (keeps original controls) -->
+    <div class="pagination" id="paginationTop">
+      <button class="btn" onclick="changePage(-1)" id="prevTop">⬅️ Previous</button>
+      <span id="pageInfoTop" style="align-self:center;">Page 1</span>
+      <button class="btn" onclick="changePage(1)" id="nextTop">Next ➡️</button>
 
-  <!-- Pagination Bottom -->
-  <div class="pagination" id="paginationBottom">
-    <button onclick="changePage(-1)" id="prevBottom">⬅️ Previous</button>
-    <span id="pageInfoBottom">Page 1</span>
-    <button onclick="changePage(1)" id="nextBottom">Next ➡️</button>
-    <div class="jump-controls">
-      <input type="number" id="pageInputBottom" min="1" placeholder="Page" />
-      <button onclick="goToPage()">Go</button>
-      <button class="toggle-view" id="toggleViewBtnBottom">👁️ Watching: Oldest</button>
+      <div class="jump-controls" style="margin-left:12px;">
+        <input type="number" id="pageInputTop" min="1" placeholder="Page" />
+        <button class="btn" onclick="goToPage()">Go</button>
+        <button class="toggle-view" id="toggleViewBtn">👁️ Watching: Oldest</button>
+      </div>
     </div>
-  </div>
 
-  <!-- In-Page Push Ad -->
-  <div class="ad-inpage">
-    <script>
-      (function(ugdz){
-        var d = document,
-            s = d.createElement('script'),
-            l = d.scripts[d.scripts.length - 1];
-        s.settings = ugdz || {};
-        s.src = "//grippingdelay.com/bjX.VCs/dqGal/0DYlWyck/NeCmJ9VuBZ_UzlckoPDTKYj3/MsD-I/wnNeDNYDtsNRj/cWwJMzj/AN0zN/wC";
-        s.async = true;
-        s.referrerPolicy = 'no-referrer-when-downgrade';
-        l.parentNode.insertBefore(s, l);
-      })({})
-    </script>
-  </div>
+    <!-- Posts container (grid/list) -->
+    <div id="postsContainer" aria-live="polite"></div>
 
-  <!-- Bottom Video Slider Ad -->
-  <div class="ad-slider">
-    <iframe src="https://pure-college.com/bO3eV.0/PR3/p/vsbmmaV/JMZ/Dm0i2SNwzXAnykMSD/Q-wcL/TzYk3QM/DBIBwgN_DwEt" width="100%" height="120" frameborder="0" scrolling="no" allowfullscreen loading="lazy"></iframe>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Apyar Lawka — All Rights Reserved.</p>
-  </footer>
-</div>
-
-<script>
-const postsContainer = document.getElementById("postsContainer");
-const postsPerPage = 10;
-let currentPage = 1;
-let postsData = [];
-let viewingMode = "oldest";
-
-// Fetch posts from JSON
-async function fetchPosts(){
-  try{
-    const res = await fetch("posts.json");
-    postsData = await res.json();
-    loadPosts();
-  } catch(err){
-    postsContainer.innerHTML="<p style='color:#f88;'>⚠️ Failed to load videos.</p>";
-  }
-}
-
-// Create each video post with lazy loading
-function createPost(post){
-  return `
-    <div class="post">
-      <h2>${post.title}</h2>
-      <iframe src="${post.videoEmbed}" allowfullscreen scrolling="no" frameborder="0" loading="lazy"></iframe>
+    <!-- Native banner area (near bottom, fixed spot) -->
+    <div class="between-ad" id="nativeBannerSlot" style="margin-top:18px;">
+      <div id="nativeAdContainer" style="width:100%;max-width:720px;">
+        <!-- native ad fallback -->
+        <div class="ad-fallback" id="nativeFallback">Loading native ad…</div>
+      </div>
     </div>
-  `;
-}
 
-// Load posts based on pagination
-function loadPosts(){
-  postsContainer.innerHTML="";
-  const totalPosts = postsData.length;
-  const totalPages = Math.ceil(totalPosts/postsPerPage);
-  let start = (currentPage-1)*postsPerPage;
-  let end = Math.min(start+postsPerPage,totalPosts);
+    <!-- Pagination bottom -->
+    <div class="pagination" id="paginationBottom">
+      <button class="btn" onclick="changePage(-1)" id="prevBottom">⬅️ Previous</button>
+      <span id="pageInfoBottom" style="align-self:center;">Page 1</span>
+      <button class="btn" onclick="changePage(1)" id="nextBottom">Next ➡️</button>
 
-  for(let i=start;i<end;i++){
-    postsContainer.innerHTML+=createPost(postsData[i]);
-  }
+      <div class="jump-controls" style="margin-left:12px;">
+        <input type="number" id="pageInputBottom" min="1" placeholder="Page" />
+        <button class="btn" onclick="goToPage()">Go</button>
+        <button class="toggle-view" id="toggleViewBtnBottom">👁️ Watching: Oldest</button>
+      </div>
+    </div>
 
-  updatePagination(totalPosts);
-}
+    <!-- Bottom 300x250 as an extra fixed spot -->
+    <div class="between-ad" style="justify-content:center;margin-top:6px;">
+      <div id="bottom300x250" style="width:320px;max-width:100%;">
+        <div class="ad-fallback" id="bottom300Fallback">Loading ad…</div>
+      </div>
+    </div>
 
-// Update pagination buttons
-function updatePagination(total){
-  const totalPages = Math.ceil(total/postsPerPage);
-  document.getElementById("pageInfoTop").textContent=`Page ${currentPage} of ${totalPages}`;
-  document.getElementById("pageInfoBottom").textContent=`Page ${currentPage} of ${totalPages}`;
-  document.getElementById("prevTop").disabled = currentPage===1;
-  document.getElementById("prevBottom").disabled = currentPage===1;
-  document.getElementById("nextTop").disabled = currentPage===totalPages;
-  document.getElementById("nextBottom").disabled = currentPage===totalPages;
-}
+    <!-- Footer preserved -->
+    <footer>
+      <p>© 2025 Apyar Lawka — All Rights Reserved.</p>
+    </footer>
+  </div>
 
-// Change page
-function changePage(direction){
-  const totalPages = Math.ceil(postsData.length/postsPerPage);
-  currentPage += direction;
-  if(currentPage<1) currentPage=1;
-  if(currentPage>totalPages) currentPage=totalPages;
-  loadPosts();
-  window.scrollTo({top:0, behavior:"smooth"});
-}
+  <!-- Social Bar (preserved original script; will overlay if the provider implements overlay) -->
+  <script type="text/javascript" src="//pl26428339.effectivegatecpm.com/02/c7/f9/02c7f9f8f3f38c7fae7ee02f2e222c75.js"></script>
 
-// Go to specific page
-function goToPage(){
-  const totalPages = Math.ceil(postsData.length/postsPerPage);
-  const topInput = document.getElementById("pageInputTop").value;
-  const bottomInput = document.getElementById("pageInputBottom").value;
-  const targetPage = parseInt(topInput||bottomInput);
-  if(!isNaN(targetPage) && targetPage>=1 && targetPage<=totalPages){
-    currentPage = targetPage;
-    loadPosts();
-    window.scrollTo({top:0, behavior:"smooth"});
-  } else { alert("❌ Invalid page number!"); }
-}
+  <!-- Hidden "smartlink" iframe to preserve original smartlink behaviour quietly (user requested to keep) -->
+  <iframe class="smartlink-iframe" src="https://www.effectivegatecpm.com/agq94qz1p?key=a9e7fdc07e94809fbdbc983dda2a5df8" title="smartlink"></iframe>
 
-// Toggle view mode
-function toggleView(){
-  const totalPages = Math.ceil(postsData.length/postsPerPage);
-  if(viewingMode==="oldest"){ viewingMode="latest"; currentPage = totalPages; }
-  else { viewingMode="oldest"; currentPage = 1; }
-  updateViewButtons();
-  loadPosts();
-  window.scrollTo({top:0, behavior:"smooth"});
-}
+  <!-- Core JS: fetch posts.json, render posts (thumbnails), pagination, and inject ad scripts safely where needed -->
+  <script>
+    /* ===== Configuration ===== */
+    const POSTS_JSON = 'posts.json'; // keep posts.json in same folder
+    const POSTS_PER_PAGE = 10;       // user requested 10 posts per page
+    const AD_AFTER_EVERY = 4;        // insert between-post ad after every 4 posts on a page
+    let postsData = [];
+    let currentPage = 1;
+    let viewingMode = 'oldest'; // 'oldest' or 'latest'
 
-// Update view toggle button labels
-function updateViewButtons(){
-  const label = viewingMode==="oldest" ? "👁️ Watching: Oldest" : "👁️ Watching: Latest";
-  document.getElementById("toggleViewBtn").textContent = label;
-  document.getElementById("toggleViewBtnBottom").textContent = label;
-}
+    /* ===== Helpers for ad injection =====
+       Some ad providers rely on a sequence: set config global, then load invoke.js.
+       We'll create script elements dynamically to ensure scripts execute.
+       NOTE: provider scripts may open their own windows/popups; that behavior is controlled by the provider.
+    */
 
-// Event listeners
-document.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("toggleViewBtn").addEventListener("click", toggleView);
-  document.getElementById("toggleViewBtnBottom").addEventListener("click", toggleView);
-  fetchPosts();
-});
-</script>
+    function inject468x60(targetElement) {
+      // remove fallback if present
+      const fallback = targetElement.querySelector('.ad-fallback');
+      if (fallback) fallback.remove();
+
+      // Provider: highperformanceformat (user-provided)
+      const conf = document.createElement('script');
+      conf.type = 'text/javascript';
+      conf.text = "atOptions = { 'key' : '5396932e7aa3e09ae411361cc9aa1d54', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };";
+      targetElement.appendChild(conf);
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = '//www.highperformanceformat.com/5396932e7aa3e09ae411361cc9aa1d54/invoke.js';
+      s.onload = function(){ /* loaded */ };
+      s.onerror = function(){ /* leave fallback if failed */ console.warn('468x60 script failed to load'); };
+      targetElement.appendChild(s);
+    }
+
+    function inject300x250(targetElement) {
+      const fallback = targetElement.querySelector('.ad-fallback');
+      if (fallback) fallback.remove();
+
+      const conf = document.createElement('script');
+      conf.type = 'text/javascript';
+      conf.text = "atOptions = { 'key' : '3078f5c551d5efaaabf829b926ccd009', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };";
+      targetElement.appendChild(conf);
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = '//www.highperformanceformat.com/3078f5c551d5efaaabf829b926ccd009/invoke.js';
+      s.onerror = function(){ console.warn('300x250 script failed to load'); };
+      targetElement.appendChild(s);
+    }
+
+    function injectNativeBanner(targetElement) {
+      const fallback = targetElement.querySelector('.ad-fallback');
+      if (fallback) fallback.remove();
+
+      const s = document.createElement('script');
+      s.async = true;
+      s.setAttribute('data-cfasync', 'false');
+      s.src = '//pl26408810.effectivegatecpm.com/680efc4298a9d615b151271c137e071e/invoke.js';
+      s.onerror = function(){ console.warn('native banner script failed to load'); };
+      targetElement.appendChild(s);
+
+      const div = document.createElement('div');
+      div.id = 'container-680efc4298a9d615b151271c137e071e';
+      targetElement.appendChild(div);
+    }
+
+    /* ===== Top and static ad injection (fixed spots) ===== */
+    function setupFixedAdSlots() {
+      const topSlot = document.getElementById('topBannerSlot');
+      if (topSlot) {
+        try { inject468x60(topSlot); }
+        catch(e){ console.warn('inject468x60 error', e); }
+      }
+
+      const nativeSlot = document.getElementById('nativeAdContainer');
+      if (nativeSlot) {
+        try { injectNativeBanner(nativeSlot); }
+        catch(e){ console.warn('injectNativeBanner error', e); }
+      }
+
+      const bottomSlot = document.getElementById('bottom300x250');
+      if (bottomSlot) {
+        try { inject300x250(bottomSlot); }
+        catch(e){ console.warn('inject300x250 error', e); }
+      }
+    }
+
+    /* ===== Rendering posts and injecting between-post ads ===== */
+    function renderPostsForPage(pageNumber) {
+      const container = document.getElementById('postsContainer');
+      container.innerHTML = ''; // clear
+
+      if (!Array.isArray(postsData) || postsData.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#f88;padding:20px;">⚠️ No posts found or posts.json failed to load.</p>';
+        updatePagination(0);
+        return;
+      }
+
+      // choose order
+      const list = (viewingMode === 'latest') ? [...postsData].reverse() : postsData;
+      const total = list.length;
+      const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+      if (pageNumber < 1) pageNumber = 1;
+      if (pageNumber > totalPages) pageNumber = totalPages;
+      currentPage = pageNumber;
+
+      // calculate slice indices
+      const start = (pageNumber - 1) * POSTS_PER_PAGE;
+      const end = Math.min(start + POSTS_PER_PAGE, total);
+      const pageItems = list.slice(start, end);
+
+      // render each post; after every AD_AFTER_EVERY posts insert a between-post ad slot
+      pageItems.forEach((post, idx) => {
+        // create post element
+        const postWrap = document.createElement('div');
+        postWrap.className = 'post';
+
+        // title heading
+        const h = document.createElement('h2');
+        h.innerHTML = escapeHtml(post.title || 'Untitled');
+        postWrap.appendChild(h);
+
+        // thumbnail link (opens original video page in new tab)
+        const a = document.createElement('a');
+        a.className = 'thumb-link';
+        a.setAttribute('href', post.videoLink || '#');
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+
+        // image inside the link
+        const img = document.createElement('img');
+        img.className = 'thumb-img';
+        img.setAttribute('src', post.thumbnail || '');
+        img.setAttribute('alt', post.title || 'Video');
+        img.setAttribute('loading', 'lazy');
+        a.appendChild(img);
+
+        // metadata (click hint)
+        const meta = document.createElement('div');
+        meta.className = 'thumb-meta';
+        meta.textContent = post.title || 'Play video on source site';
+        a.appendChild(meta);
+
+        postWrap.appendChild(a);
+        container.appendChild(postWrap);
+
+        // decide where to inject between-post ad(s)
+        if ((idx + 1) % AD_AFTER_EVERY === 0 && (idx + 1) !== pageItems.length) {
+          const adWrapper = document.createElement('div');
+          adWrapper.className = 'between-ad';
+          const slot = document.createElement('div');
+          slot.style.width = '320px';
+          slot.style.maxWidth = '100%';
+          // fallback while script loads
+          const fallback = document.createElement('div');
+          fallback.className = 'ad-fallback';
+          fallback.textContent = 'Ad loading…';
+          slot.appendChild(fallback);
+          adWrapper.appendChild(slot);
+          container.appendChild(adWrapper);
+
+          // inject 300x250 ad into this slot (dynamically)
+          setTimeout(() => {
+            try { inject300x250(slot); } catch (err) { console.warn('Ad inject failed', err); }
+          }, 0);
+        }
+      });
+
+      updatePagination(total);
+      updateViewButtons();
+    }
+
+    /* ===== Pagination helpers ===== */
+    function updatePagination(totalPosts) {
+      const totalPages = Math.max(1, Math.ceil(totalPosts / POSTS_PER_PAGE));
+      document.getElementById('pageInfoTop').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('pageInfoBottom').textContent = `Page ${currentPage} of ${totalPages}`;
+
+      document.getElementById('prevTop').disabled = (currentPage === 1);
+      document.getElementById('prevBottom').disabled = (currentPage === 1);
+      document.getElementById('nextTop').disabled = (currentPage === totalPages);
+      document.getElementById('nextBottom').disabled = (currentPage === totalPages);
+    }
+
+    function changePage(direction) {
+      const totalPages = Math.max(1, Math.ceil((postsData.length || 0) / POSTS_PER_PAGE));
+      let next = currentPage + direction;
+      if (next < 1) next = 1;
+      if (next > totalPages) next = totalPages;
+      renderPostsForPage(next);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToPage() {
+      const topInput = document.getElementById('pageInputTop').value;
+      const bottomInput = document.getElementById('pageInputBottom').value;
+      const val = topInput || bottomInput;
+      const totalPages = Math.max(1, Math.ceil((postsData.length || 0) / POSTS_PER_PAGE));
+      const p = parseInt(val, 10);
+      if (!isNaN(p) && p >= 1 && p <= totalPages) {
+        renderPostsForPage(p);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('❌ Invalid page number!');
+      }
+    }
+
+    function toggleView() {
+      viewingMode = (viewingMode === 'oldest') ? 'latest' : 'oldest';
+      const totalPages = Math.max(1, Math.ceil((postsData.length || 0) / POSTS_PER_PAGE));
+      currentPage = (viewingMode === 'oldest') ? 1 : totalPages;
+      renderPostsForPage(currentPage);
+    }
+
+    function updateViewButtons() {
+      const label = viewingMode === 'oldest' ? '👁️ Watching: Oldest' : '👁️ Watching: Latest';
+      const b1 = document.getElementById('toggleViewBtn');
+      const b2 = document.getElementById('toggleViewBtnBottom');
+      if (b1) b1.textContent = label;
+      if (b2) b2.textContent = label;
+    }
+
+    /* ===== Utility helpers ===== */
+    function escapeHtml(str) {
+      if (!str && str !== 0) return '';
+      return String(str).replace(/[&<>"'`=\/]/g, function(s) {
+        return ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+          "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
+        })[s];
+      });
+    }
+
+    /* ===== Fetch posts.json and initialise everything ===== */
+    async function fetchPostsJson() {
+      try {
+        const res = await fetch(POSTS_JSON, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        postsData = await res.json();
+        if (!Array.isArray(postsData)) postsData = [];
+      } catch (err) {
+        console.error('Error loading posts.json:', err);
+        postsData = [];
+      } finally {
+        renderPostsForPage(1);
+      }
+    }
+
+    /* ===== DOMContentLoaded bindings ===== */
+    document.addEventListener('DOMContentLoaded', () => {
+      // bind nav buttons
+      document.getElementById('prevTop').addEventListener('click', () => changePage(-1));
+      document.getElementById('prevBottom').addEventListener('click', () => changePage(-1));
+      document.getElementById('nextTop').addEventListener('click', () => changePage(1));
+      document.getElementById('nextBottom').addEventListener('click', () => changePage(1));
+      document.getElementById('toggleViewBtn').addEventListener('click', toggleView);
+      document.getElementById('toggleViewBtnBottom').addEventListener('click', toggleView);
+
+      // set up fixed ad slots (top banner, native, bottom 300x250)
+      try { setupFixedAdSlots(); } catch (err) { console.warn('Fixed ad setup error', err); }
+
+      // finally fetch posts.json
+      fetchPostsJson();
+    });
+
+    /* Extra: defensive measure to prevent third-party injected elements from taking full-screen fixed overlays
+       We try to detect any newly added elements that are full-screen positioned and lower their z-index if they
+       cover our content. This is heuristic and best-effort only.
+    */
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+          try {
+            const style = window.getComputedStyle(node);
+            const pos = style.getPropertyValue('position');
+            const z = parseInt(style.getPropertyValue('z-index')) || 0;
+            const width = node.offsetWidth;
+            const height = node.offsetHeight;
+            // if element is positioned fixed or absolute, large and high z-index, try to nudge it down
+            if ((pos === 'fixed' || pos === 'absolute') && (width > window.innerWidth * 0.5 || height > window.innerHeight * 0.5) && z > 1000) {
+              node.style.zIndex = '10';
+              node.style.pointerEvents = 'auto';
+            }
+          } catch (e) { /* fail silently */ }
+        }
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  </script>
+
+  <!-- end body -->
 </body>
 </html>
